@@ -10,6 +10,19 @@ window.onload = async () => {
     let response = await fetch('http://localhost:3031/api/movies');
     let peliculas = await response.json();
     let data = peliculas.data
+    const favorites = localStorage.getItem("favorites")
+  ? JSON.parse(localStorage.getItem("favorites"))
+  : [];
+
+  if (favorites.length > 0) {
+    const misFavoritosButton = document.createElement("button");
+    misFavoritosButton.setAttribute("class", "botonAgregar");
+    misFavoritosButton.innerHTML = "Mis películas favoritas";
+    misFavoritosButton.addEventListener("click", () => {
+      location.href = "favoritas.html";
+    });
+    app.insertBefore(misFavoritosButton, app.firstChild);
+  }
 
     data.forEach((movie) => {
       const card = document.createElement("div");
@@ -32,20 +45,36 @@ window.onload = async () => {
         genero.textContent = `Genero: ${movie.genre.name}`;
         card.appendChild(genero);
       }
+
       card.appendChild(duracion);
+
       const a = document.createElement("a");
-      a.setAttribute("href", "formulario.html?id=" + movie.id);
       a.setAttribute("class", "botonAgregar");
+      a.setAttribute("href", "formulario.html?id=" + movie.id);
       a.textContent = "Ver más";
       card.appendChild(a)
 
-      //Estrella de favoritos:
       const star = document.createElement("a");
       star.setAttribute("class", "botonAgregar");
-      star.innerHTML = '<i class="fa-regular fa-star fa-beat" style="color: #f6fa00;"></i>';
       star.setAttribute("id", "movie" + movie.id)
+      star.innerHTML = '<i class="fa-regular fa-star fa-beat" style="color: #f6fa00;"></i>';
       card.appendChild(star)
+
+
+      star.addEventListener("click", () => {
+        const favorites = localStorage.getItem("favorites")
+          ? JSON.parse(localStorage.getItem("favorites"))
+          : [];
+        const movieId = movie.id;
+  
+        if (!favorites.includes(movieId)) {
+          favorites.push(movieId);
+          localStorage.setItem("favorites", JSON.stringify(favorites));
+        }
+      });
     });
+
+
 
   } catch (error) {
     console.log(error);
